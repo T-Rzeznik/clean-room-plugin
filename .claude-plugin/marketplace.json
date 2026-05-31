@@ -1,0 +1,14 @@
+{
+  "name": "trzeznik-tools",
+  "owner": {
+    "name": "T-Rzeznik",
+    "email": "trzeznik29@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "clean-room",
+      "source": "./clean-room",
+      "description": "Clean-room 'vibe reverse engineering': extract a project into strict, bounded rebuild-docs, then orchestrate a faithful 1:1 rebuild from specs alone — coding agents never see the original source."
+    }
+  ]
+}

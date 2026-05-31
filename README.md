@@ -1,0 +1,126 @@
+# clean-room
+
+**Clean-room "vibe reverse engineering" for [Claude Code](https://claude.com/claude-code).**
+
+Extract any project into a folder of strict, **bounded** rebuild specs — then reconstruct
+it 1:1 from those specs alone. The agents that do the rebuild never see the original
+source, so the result is independent by construction, not just by promise.
+
+This repo is a Claude Code **plugin marketplace** containing one plugin: `clean-room`.
+
+---
+
+## Why
+
+"Clean-room design" means one team documents *behavior* without copying implementation, and
+a second team rebuilds *only* from those docs — the docs are a wall between the original and
+the clone. This plugin automates both sides of that wall with specialized agents whose
+**tool access** enforces the separation:
+
+| Agent | Phase | Can read the original source? |
+|-------|-------|-------------------------------|
+| `cleanroom-surveyor` | A · read | ✅ reads source → structured survey |
+| `cleanroom-scribe`   | A · write | ✅ reads source for verbatim facts → writes docs |
+| `cleanroom-architect`| B · truth | ❌ **docs only** — the wall |
+| coding agents        | B · build | ❌ spawned with only a scoped spec packet |
+
+---
+
+## The two phases
+
+**Phase A — Extract** (`/clean-room-extract`)
+Reads the original source and writes `rebuild-docs/`:
+- `cleanroom-surveyor` (read-only) understands the code → a structured SURVEY.
+- `cleanroom-scribe` turns the SURVEY into 11 numbered spec docs.
+
+**Phase B — Rebuild** (`/clean-room-rebuild <path-to-rebuild-docs> <target-dir>`)
+Points only at `rebuild-docs/` and reconstructs the project:
+- `cleanroom-architect` is the *Truth* — a read-only oracle over the docs (never the
+  source). It hands scoped spec packets to coding agents and judges their output.
+- The command orchestrates the loop: per build step → packet → coding agent → acceptance.
+
+---
+
+## What's in `rebuild-docs/`
+
+```
+00-MANIFEST     01-product-spec   02-architecture   03-stack       04-data-model
+05-interfaces   06-logic          07-ui-style       08-gotchas     09-build-plan
+10-acceptance
+```
+
+Three mechanisms make the docs **bounded scaffolding**, not loose notes:
+
+- **Closed inventories** — exhaustive lists (every route, model, dependency+version, env
+  var, file). The rebuild produces *exactly* those items, no more, no less.
+- **Scope fences** — every spec doc ends with `## Out of scope — do NOT build`, so a
+  vibe-agent can't hallucinate features the original never had.
+- **Acceptance gates** — per-feature pass/fail checks so the rebuild self-verifies.
+
+**The verbatim line:** interface *facts* (constants, schemas, UI copy, design tokens,
+public signatures) are copied verbatim; procedural *logic* is paraphrased to pseudocode and
+never pasted (`06-logic.md`). The surface stays exact while the implementation is rebuilt
+independently.
+
+---
+
+## Install
+
+Requires [Claude Code](https://claude.com/claude-code).
+
+Add this repo as a plugin marketplace, then install the plugin:
+
+```
+/plugin marketplace add T-Rzeznik/clean-room-plugin
+/plugin install clean-room@trzeznik-tools
+```
+
+> `T-Rzeznik/clean-room-plugin` is the GitHub `owner/repo`. You can also pass a full URL
+> (`https://github.com/T-Rzeznik/clean-room-plugin`) or a local path to a clone.
+
+To update later:
+
+```
+/plugin marketplace update trzeznik-tools
+```
+
+---
+
+## Use
+
+From inside the project you want to reverse-engineer:
+
+```
+/clean-room-extract
+```
+
+This generates `rebuild-docs/` in the project. Then, to reconstruct from the docs alone
+into a fresh, empty directory:
+
+```
+/clean-room-rebuild ./rebuild-docs ./rebuilt
+```
+
+The rebuild agents read only `./rebuild-docs` — never the original source.
+
+---
+
+## Repo layout
+
+```
+clean-room-plugin/
+├─ .claude-plugin/marketplace.json        # marketplace "trzeznik-tools"
+└─ clean-room/                            # the plugin
+   ├─ .claude-plugin/plugin.json
+   ├─ README.md
+   ├─ skills/clean-room-extract/SKILL.md  # Phase A orchestrator
+   ├─ agents/
+   │  ├─ cleanroom-surveyor.md            # Phase A reader  (read-only)
+   │  ├─ cleanroom-scribe.md              # Phase A writer  (owns the doc templates)
+   │  └─ cleanroom-architect.md           # Phase B "Truth" oracle (docs-only)
+   └─ commands/clean-room-rebuild.md      # Phase B orchestrator
+```
+
+## License
+
+MIT — see [LICENSE](LICENSE).
