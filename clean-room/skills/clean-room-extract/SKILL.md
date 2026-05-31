@@ -33,21 +33,33 @@ What makes these docs **bounded scaffolding** rather than loose notes:
 - **Paraphrase to pseudocode — NEVER paste:** procedural bodies, algorithms, business
   logic, control flow. These live in `06-logic.md` as language-neutral pseudocode.
 
+## Workflow this fits into
+
+You run this **from inside the NEW (destination) repo** — the empty repo where the rebuild
+will live (and where this plugin is installed). The **SOURCE** is a *separate* local
+checkout elsewhere on disk (e.g. a `git clone` of the original in a sibling directory).
+Extraction reads the SOURCE and writes `rebuild-docs/` into the CURRENT repo. Everything
+after extraction stays in the current repo; the SOURCE is never written to and can be
+deleted once `rebuild-docs/` exists.
+
 ## How to run it (orchestration)
 
-### Step 0 — Resolve target & output
-Target = path the user names, else current repo root. Output = `rebuild-docs/` at the
-target root. Confirm before overwriting an existing one.
+### Step 0 — Resolve source & output
+- **SOURCE** = the path the user gives to the cloned original. **REQUIRED — do NOT default
+  to the current repo** (the current repo is the empty destination). If it wasn't given,
+  ask for it. Confirm the SOURCE is outside the current repo.
+- **OUTPUT** = `rebuild-docs/` in the **current working directory** (the new repo). Never
+  write into the SOURCE. Confirm before overwriting an existing `rebuild-docs/`.
 
 ### Step 1 — Survey (dispatch the reader)
-Spawn the **`cleanroom-surveyor`** agent (read-only) on the target. It detects project
-type and returns a structured SURVEY: project type + all inventories + pseudocode-ready
-notes on logic. Wait for it; the SURVEY is its return value.
+Spawn the **`cleanroom-surveyor`** agent (read-only) pointed at the SOURCE path. It detects
+project type and returns a structured SURVEY: project type + all inventories +
+pseudocode-ready notes on logic. Wait for it; the SURVEY is its return value.
 
 ### Step 2 — Write the docs (dispatch the writer)
-Spawn the **`cleanroom-scribe`** agent. Pass it: the SURVEY from Step 1, the absolute
-target/output path, and permission to Read the source for grabbing exact verbatim facts.
-It writes the fixed doc set into `rebuild-docs/`:
+Spawn the **`cleanroom-scribe`** agent. Pass it: the SURVEY from Step 1, the SOURCE path
+(read-only, for grabbing exact verbatim facts), and the OUTPUT path `./rebuild-docs` in the
+current repo. It writes the fixed doc set into `./rebuild-docs/`:
 
 ```
 00-MANIFEST.md   01-product-spec.md   02-architecture.md   03-stack.md
@@ -74,5 +86,6 @@ counts (routes, models, deps, env vars), and any gaps you could not resolve.
 > If the two agents are unavailable, you may perform Steps 1–2 inline yourself — but keep
 > the reader/writer separation in spirit: survey fully *before* writing.
 
-When this is done, the user runs **`/clean-room-rebuild`** (Phase B) — pointed only at
-`rebuild-docs/` — to reconstruct the project.
+When this is done, the user runs **`/clean-room-rebuild`** (Phase B) from this same repo —
+pointed only at `./rebuild-docs/` — to reconstruct the project into this repo. The SOURCE
+clone is no longer needed and may be deleted.

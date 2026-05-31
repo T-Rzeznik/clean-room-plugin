@@ -1,24 +1,27 @@
 ---
 description: Phase B — rebuild a project from rebuild-docs/ alone, without ever touching the original source
-argument-hint: [path-to-rebuild-docs] [target-output-dir]
+argument-hint: [path-to-rebuild-docs=./rebuild-docs] [target-output-dir=.]
 allowed-tools: Read, Grep, Glob, Write, Edit, Bash, Task
 ---
 
 # Clean-Room Rebuild (Phase B)
 
-You are the **orchestrator** for a clean-room rebuild. Ground truth is `rebuild-docs/`
-produced by Phase A. The hard rule: **no agent involved in this rebuild — including you —
-reads the original project's source.** The docs are the only permitted input. The
-`cleanroom-architect` is the Truth oracle over those docs; coding agents receive only the
-scoped packets it produces.
+You are the **orchestrator** for a clean-room rebuild. You run from inside the NEW repo,
+where Phase A already produced `./rebuild-docs/` and where the rebuilt code will live.
+Ground truth is `rebuild-docs/`. The hard rule: **no agent involved in this rebuild —
+including you — reads the original project's source.** The original lives in a separate
+directory (the Phase A clone) and may already be deleted; either way it is off-limits. The
+docs are the only permitted input. The `cleanroom-architect` is the Truth oracle over those
+docs; coding agents receive only the scoped packets it produces.
 
-Inputs: `$1` = path to `rebuild-docs/` (ask if missing). `$2` = target output directory
-for the rebuilt project (default: a fresh, empty sibling dir — confirm it's empty).
+Inputs: `$1` = path to `rebuild-docs/` (default `./rebuild-docs`; ask if absent). `$2` =
+target output directory for the rebuilt project (default `.` — the current/new repo).
 
 ## Procedure
 
-1. **Confirm the wall.** Verify `$1` exists and `$2` is empty (or create it). The original
-   source must NOT be inside `$2` and must not be read during this run.
+1. **Confirm the wall.** Verify `$1` exists. `$2` is the current repo (it may already
+   contain `rebuild-docs/` and this plugin); the rebuilt code lands here. The original
+   SOURCE clone must NOT be inside `$2` and must not be read during this run.
 2. **Load the plan.** Read only `00-MANIFEST.md` and `09-build-plan.md` from `$1` to get
    the project type, canonical inventory counts, and ordered build steps. (Don't bulk-read
    every doc into your own context — that's the architect's job.)

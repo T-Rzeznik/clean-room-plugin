@@ -88,20 +88,29 @@ To update later:
 
 ## Use
 
-From inside the project you want to reverse-engineer:
+The plugin lives in the **new repo** you're building into. The software you're recreating
+is cloned into a **separate directory** that stays read-only — and that physical separation
+is what enforces the clean-room wall.
 
 ```
-/clean-room-extract
+# 1. Create and enter the new (empty) repo — this is where the rebuild will live.
+mkdir my-rebuild && cd my-rebuild && git init
+
+# 2. Install the plugin (see Install above), then clone the ORIGINAL somewhere SEPARATE.
+git clone https://github.com/some/original ../original-clone
+
+# 3. Phase A — extract. Point it at the clone; docs are written into THIS repo.
+/clean-room-extract ../original-clone
+#   → creates ./rebuild-docs/ here. The clone is now optional and can be deleted:
+rm -rf ../original-clone
+
+# 4. Phase B — rebuild into THIS repo, from the docs alone.
+/clean-room-rebuild
+#   (defaults: docs = ./rebuild-docs, output = . )
 ```
 
-This generates `rebuild-docs/` in the project. Then, to reconstruct from the docs alone
-into a fresh, empty directory:
-
-```
-/clean-room-rebuild ./rebuild-docs ./rebuilt
-```
-
-The rebuild agents read only `./rebuild-docs` — never the original source.
+Extraction reads the external clone and writes only into the current repo. The rebuild
+agents read only `./rebuild-docs` — never the original source (which may already be gone).
 
 ---
 

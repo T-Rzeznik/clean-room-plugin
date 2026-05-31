@@ -44,7 +44,10 @@ independently rebuilt.
 
 ## Use
 
+Install this plugin in the **new repo** you're building into, and clone the original into a
+**separate** directory (that separation is the clean-room wall).
+
 ```
-/clean-room-extract            # Phase A: generates rebuild-docs/ for the current repo
-/clean-room-rebuild ./rebuild-docs ./rebuilt   # Phase B: reconstruct from docs alone
+/clean-room-extract ../original-clone   # Phase A: reads the external clone, writes ./rebuild-docs/ here
+/clean-room-rebuild                      # Phase B: rebuild into this repo from ./rebuild-docs alone
 ```
