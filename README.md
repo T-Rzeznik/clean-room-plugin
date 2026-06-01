@@ -49,7 +49,7 @@ Real rebuilds rarely fit one context window, so Phase B manages context at two l
   subagent whose context is discarded on return (an automatic reset at every module).
 - **`REBUILD-PROGRESS.md`** is an *append-only* journal in the new repo. After every module
   the orchestrator appends what it built, the decisions/constraints/caveats a future agent
-  must honor, and the next step. When context approaches **~200k tokens**, it finishes the
+  must honor, and the next step. When context approaches **~170k tokens**, it finishes the
   current module, writes a handoff entry, and stops. `/clean-room-resume` then continues the
   build in a *fresh* context, reading the journal as its entire handoff. This repeats until
   the build is done — so a project of any size can be rebuilt across many context windows.

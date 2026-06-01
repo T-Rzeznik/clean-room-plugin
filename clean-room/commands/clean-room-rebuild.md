@@ -43,8 +43,8 @@ context. After each module, append one entry:
 - Next: <the exact build-plan step id the following agent should start with>
 ```
 
-### The context-budget handoff flag (≈200k tokens)
-Monitor your own context usage. **When it reaches ~200,000 tokens, raise `HANDOFF_NEEDED`.**
+### The context-budget handoff flag (≈170k tokens)
+Monitor your own context usage. **When it reaches ~170,000 tokens, raise `HANDOFF_NEEDED`.**
 Do NOT interrupt mid-module. Instead:
 1. Finish the module currently in flight and get it to acceptance PASS.
 2. Append its normal progress entry (above), making sure `Decisions`, `Constraints`, and
@@ -67,7 +67,10 @@ Do NOT interrupt mid-module. Instead:
 3. **Load the plan.** Read only `00-MANIFEST.md` and `09-build-plan.md` from `$1` to get the
    project type, canonical inventory counts, and ordered build steps. (Don't bulk-read every
    doc into your own context — that's the architect's job.)
-4. **For each remaining build-plan step, in order:**
+4. **For each remaining build-plan step, in order — run these back-to-back and do NOT stop
+   after one module.** Keep building step after step automatically until you hit the context
+   budget, need user input, or finish. Appending a progress entry is a checkpoint, not a
+   stopping point — never pause to ask "should I continue?" between modules.
    a. Ask the **`cleanroom-architect`** agent: *"Packet for build step: <step>."* It returns
       a self-contained spec packet (exact surface, pseudocode, verbatim facts, scope fence,
       acceptance checks) — sourced only from `rebuild-docs/`.
@@ -86,8 +89,13 @@ Do NOT interrupt mid-module. Instead:
       criteria. On FAIL or scope violation, send the discrepancy back to a coding agent and
       repeat until it passes.
    f. **Append a progress entry** to `REBUILD-PROGRESS.md` (format above).
-   g. **Check the budget.** If `HANDOFF_NEEDED` is raised, perform the handoff sequence and
-      stop. Otherwise continue to the next step.
+   g. **Check the budget, then keep going.** If `HANDOFF_NEEDED` is raised (~170k tokens),
+      perform the handoff sequence and stop. Otherwise **immediately start the next step** —
+      do not yield control just because a module finished.
+
+   **The ONLY reasons to stop:** (1) context budget hit (~170k → handoff), (2) user input
+   required (a `clean-room-consult-source` consent prompt, or an unresolvable `GAP:`), or
+   (3) all steps done. Anything else → continue building.
 5. **Final acceptance.** When all steps pass, run the full `10-acceptance.md` surface-parity
    check via the architect: all routes/models/deps present at exact shapes/versions, and no
    features beyond the inventories. Append a final `### [done]` entry and report results.

@@ -29,18 +29,30 @@ scoped packets. The original clone is off-limits (and likely deleted).
    trust the code state, note the discrepancy in a new progress entry, and re-derive the next
    step. If `Next:` is ambiguous or absent, pick the earliest build-plan step with no
    completed entry.
-3. **Continue the loop.** From that next step, run the exact same per-step loop as
-   `/clean-room-rebuild` — for each remaining step:
+3. **Continue the loop — keep going, do NOT stop after one module.** From that next step,
+   run the exact same per-step loop as `/clean-room-rebuild`, and **repeat it back-to-back
+   for every remaining step automatically**. For each step:
    architect packet → resolve any `GAP:` (for a blocking missing *fact*, use the consent-gated
    **`clean-room-consult-source`** escape hatch, never direct source reads) → spawn a fresh
    coding subagent (scope-fenced, no source; it returns `NEED:` instead of guessing) →
-   integrate → architect judges acceptance (retry on FAIL) → **append a progress entry**.
-4. **Respect the same context budget.** Monitor your context usage; at **~200,000 tokens**
-   raise `HANDOFF_NEEDED`, finish the in-flight module, append a complete progress entry plus
-   a `--- HANDOFF (context reset) after step <id> — resume with /clean-room-resume ---`
-   marker, then stop and tell the user to continue in a fresh session with
-   `/clean-room-resume`. Each segment honors `Decisions`/`Constraints` recorded by earlier
-   segments so the rebuild stays internally consistent across handoffs.
+   integrate → architect judges acceptance (retry on FAIL) → **append a progress entry** →
+   **immediately start the next step.** Do not pause, summarize, or ask the user "should I
+   continue?" between modules — appending a progress entry is a checkpoint, not a stopping
+   point. You only stop for the three reasons below.
+
+   **The ONLY reasons to stop and yield control:**
+   - **Context budget** — your context reaches ~170,000 tokens (step 4: hand off).
+   - **User input required** — a `clean-room-consult-source` consent prompt, or a `GAP:` you
+     cannot resolve from the docs that genuinely needs the user.
+   - **Done** — no build-plan steps remain (step 5).
+   Anything else → keep building.
+4. **Respect the same context budget.** Monitor your context usage; **only** at
+   **~170,000 tokens** raise `HANDOFF_NEEDED` — finish the in-flight module, append a complete
+   progress entry plus a `--- HANDOFF (context reset) after step <id> — resume with
+   /clean-room-resume ---` marker, then stop and tell the user to continue in a fresh session
+   with `/clean-room-resume`. Below that budget, never stop just because a module finished —
+   continue to the next step. Each segment honors `Decisions`/`Constraints` recorded by
+   earlier segments so the rebuild stays internally consistent across handoffs.
 5. **Finish.** When no build-plan steps remain, run the full `10-acceptance.md` surface-parity
    check via the architect, append a final `### [done]` entry, and report results plus any
    unresolved `GAPs`.

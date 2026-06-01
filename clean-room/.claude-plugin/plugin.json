@@ -1,6 +1,6 @@
 {
   "name": "clean-room",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Clean-room reverse engineering. Phase A: read a codebase and emit strict, bounded rebuild-docs/. Phase B: an orchestrator ('the Truth') hands scoped specs to coding agents to rebuild the project 1:1 without ever seeing the original source — with context-budget handoffs (REBUILD-PROGRESS.md), a resume skill for builds too large for one context window, and a consent-gated escape hatch to pull a specific missing fact from source when the docs fall short.",
   "author": {
     "name": "T-Rzeznik",

@@ -18,7 +18,7 @@ Points only at `rebuild-docs/` and reconstructs the project:
 - The command orchestrates: per build step → packet → coding agent → acceptance check.
 - **Context management:** each module is built by an ephemeral subagent (auto-reset per
   module). The orchestrator appends progress to an **append-only `REBUILD-PROGRESS.md`**
-  journal; at **~200k tokens** it finishes the current module, writes a handoff entry, and
+  journal; at **~170k tokens** it finishes the current module, writes a handoff entry, and
   stops. `/clean-room-resume` continues in a fresh context from that journal — repeat until
   done, so projects larger than one context window can be rebuilt.
 - **Consult source** (`/clean-room-consult-source`): when the docs lack a specific *fact*
