@@ -21,6 +21,10 @@ Points only at `rebuild-docs/` and reconstructs the project:
   journal; at **~200k tokens** it finishes the current module, writes a handoff entry, and
   stops. `/clean-room-resume` continues in a fresh context from that journal — repeat until
   done, so projects larger than one context window can be rebuilt.
+- **Consult source** (`/clean-room-consult-source`): when the docs lack a specific *fact*
+  (exact schema, shape, constant, signature), an agent calls this instead of guessing. It
+  asks the user for consent, reads only the one relevant source artifact, folds the fact back
+  into `rebuild-docs/`, and logs it — the sole guarded gate through the wall.
 
 ## What's in rebuild-docs/
 
@@ -56,4 +60,5 @@ Install this plugin in the **new repo** you're building into, and clone the orig
 /clean-room-extract ../original-clone   # Phase A: reads the external clone, writes ./rebuild-docs/ here
 /clean-room-rebuild                      # Phase B: rebuild into this repo from ./rebuild-docs alone
 /clean-room-resume                       # Phase B: continue a checkpointed build in a fresh context
+# /clean-room-consult-source             # Phase B: agents call this autonomously when they need a fact from source
 ```

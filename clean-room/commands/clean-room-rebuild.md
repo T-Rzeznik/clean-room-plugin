@@ -72,10 +72,15 @@ Do NOT interrupt mid-module. Instead:
       a self-contained spec packet (exact surface, pseudocode, verbatim facts, scope fence,
       acceptance checks) — sourced only from `rebuild-docs/`.
    b. If the packet contains `GAP:` lines, resolve them: re-check the docs, or ask the user.
-      Never let a coding agent fill a gap by guessing.
+      If a missing **fact** (exact JSON schema, data/response shape, constant, signature)
+      blocks progress, invoke **`clean-room-consult-source`** — the consent-gated, scoped
+      escape hatch that reads only the needed source artifact, folds the fact back into
+      `rebuild-docs/`, and logs it. Never let a coding agent fill a gap by guessing.
    c. Spawn a **general-purpose coding agent** with ONLY that packet plus the path to the
       growing rebuild in `$2`. Instruct it explicitly: build exactly the packet's scope, add
-      nothing outside the fence, do not look for or read any original source.
+      nothing outside the fence, do not look for or read any original source. If it lacks a
+      specific fact, it must **return a `NEED:` line** describing exactly what's missing —
+      not guess, and not seek the source itself; you (the orchestrator) handle the consult.
    d. Integrate its output into `$2`.
    e. Ask the architect to **judge** the produced files against the step's acceptance
       criteria. On FAIL or scope violation, send the discrepancy back to a coding agent and

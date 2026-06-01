@@ -31,9 +31,10 @@ scoped packets. The original clone is off-limits (and likely deleted).
    completed entry.
 3. **Continue the loop.** From that next step, run the exact same per-step loop as
    `/clean-room-rebuild` — for each remaining step:
-   architect packet → resolve any `GAP:` → spawn a fresh coding subagent (scope-fenced, no
-   source) → integrate → architect judges acceptance (retry on FAIL) → **append a progress
-   entry**.
+   architect packet → resolve any `GAP:` (for a blocking missing *fact*, use the consent-gated
+   **`clean-room-consult-source`** escape hatch, never direct source reads) → spawn a fresh
+   coding subagent (scope-fenced, no source; it returns `NEED:` instead of guessing) →
+   integrate → architect judges acceptance (retry on FAIL) → **append a progress entry**.
 4. **Respect the same context budget.** Monitor your context usage; at **~200,000 tokens**
    raise `HANDOFF_NEEDED`, finish the in-flight module, append a complete progress entry plus
    a `--- HANDOFF (context reset) after step <id> — resume with /clean-room-resume ---`

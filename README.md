@@ -24,6 +24,10 @@ the clone. This plugin automates both sides of that wall with specialized agents
 | `cleanroom-architect`| B · truth | ❌ **docs only** — the wall |
 | coding agents        | B · build | ❌ spawned with only a scoped spec packet |
 
+The one sanctioned crossing is **`/clean-room-consult-source`** — a consent-gated escape
+hatch (below). The agents never read source directly; this is the only door, and it is
+guarded, scoped, and logged.
+
 ---
 
 ## The two phases
@@ -49,6 +53,14 @@ Real rebuilds rarely fit one context window, so Phase B manages context at two l
   current module, writes a handoff entry, and stops. `/clean-room-resume` then continues the
   build in a *fresh* context, reading the journal as its entire handoff. This repeats until
   the build is done — so a project of any size can be rebuilt across many context windows.
+
+**Phase B (continued) — Consult source** (`/clean-room-consult-source`)
+The escape hatch for when the docs genuinely lack a *specific fact* (an exact JSON schema,
+data/response shape, constant, or signature). A rebuild agent calls it autonomously instead
+of guessing; it **prompts you for approval**, and only on consent reads the *one* relevant
+source artifact. It copies the fact under the verbatim rule (facts only — never procedural
+logic), **folds it back into `rebuild-docs/`** so it's never re-asked, and logs the crossing
+in `REBUILD-PROGRESS.md`. The wall stays up — with a single guarded, recorded gate.
 
 ---
 
@@ -138,8 +150,9 @@ clean-room-plugin/
    ├─ .claude-plugin/plugin.json
    ├─ README.md
    ├─ skills/
-   │  ├─ clean-room-extract/SKILL.md      # Phase A orchestrator
-   │  └─ clean-room-resume/SKILL.md       # Phase B resume (continues from REBUILD-PROGRESS.md)
+   │  ├─ clean-room-extract/SKILL.md         # Phase A orchestrator
+   │  ├─ clean-room-resume/SKILL.md          # Phase B resume (continues from REBUILD-PROGRESS.md)
+   │  └─ clean-room-consult-source/SKILL.md  # Phase B consent-gated source escape hatch
    ├─ agents/
    │  ├─ cleanroom-surveyor.md            # Phase A reader  (read-only)
    │  ├─ cleanroom-scribe.md              # Phase A writer  (owns the doc templates)
