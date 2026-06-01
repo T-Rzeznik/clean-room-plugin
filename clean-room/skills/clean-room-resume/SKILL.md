@@ -34,7 +34,7 @@ scoped packets. The original clone is off-limits (and likely deleted).
    architect packet → resolve any `GAP:` → spawn a fresh coding subagent (scope-fenced, no
    source) → integrate → architect judges acceptance (retry on FAIL) → **append a progress
    entry**.
-4. **Respect the same context budget.** Monitor your context usage; at **~150,000 tokens**
+4. **Respect the same context budget.** Monitor your context usage; at **~200,000 tokens**
    raise `HANDOFF_NEEDED`, finish the in-flight module, append a complete progress entry plus
    a `--- HANDOFF (context reset) after step <id> — resume with /clean-room-resume ---`
    marker, then stop and tell the user to continue in a fresh session with

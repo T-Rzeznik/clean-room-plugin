@@ -43,8 +43,8 @@ context. After each module, append one entry:
 - Next: <the exact build-plan step id the following agent should start with>
 ```
 
-### The context-budget handoff flag (≈150k tokens)
-Monitor your own context usage. **When it reaches ~150,000 tokens, raise `HANDOFF_NEEDED`.**
+### The context-budget handoff flag (≈200k tokens)
+Monitor your own context usage. **When it reaches ~200,000 tokens, raise `HANDOFF_NEEDED`.**
 Do NOT interrupt mid-module. Instead:
 1. Finish the module currently in flight and get it to acceptance PASS.
 2. Append its normal progress entry (above), making sure `Decisions`, `Constraints`, and
