@@ -11,11 +11,16 @@ Reads the original source and writes `rebuild-docs/`:
 - `cleanroom-surveyor` (read-only) understands the code → structured SURVEY.
 - `cleanroom-scribe` turns the SURVEY into 11 numbered spec docs.
 
-**Phase B — Rebuild** (`/clean-room-rebuild` command)
+**Phase B — Rebuild** (`/clean-room-rebuild` command) and **Resume** (`/clean-room-resume` skill)
 Points only at `rebuild-docs/` and reconstructs the project:
 - `cleanroom-architect` is the *Truth* — the read-only oracle over the docs (never the
   source). It hands scoped spec packets to coding agents and judges their output.
 - The command orchestrates: per build step → packet → coding agent → acceptance check.
+- **Context management:** each module is built by an ephemeral subagent (auto-reset per
+  module). The orchestrator appends progress to an **append-only `REBUILD-PROGRESS.md`**
+  journal; at **~150k tokens** it finishes the current module, writes a handoff entry, and
+  stops. `/clean-room-resume` continues in a fresh context from that journal — repeat until
+  done, so projects larger than one context window can be rebuilt.
 
 ## What's in rebuild-docs/
 
@@ -50,4 +55,5 @@ Install this plugin in the **new repo** you're building into, and clone the orig
 ```
 /clean-room-extract ../original-clone   # Phase A: reads the external clone, writes ./rebuild-docs/ here
 /clean-room-rebuild                      # Phase B: rebuild into this repo from ./rebuild-docs alone
+/clean-room-resume                       # Phase B: continue a checkpointed build in a fresh context
 ```

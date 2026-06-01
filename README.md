@@ -39,6 +39,17 @@ Points only at `rebuild-docs/` and reconstructs the project:
   source). It hands scoped spec packets to coding agents and judges their output.
 - The command orchestrates the loop: per build step → packet → coding agent → acceptance.
 
+**Phase B (continued) — Resume** (`/clean-room-resume`)
+Real rebuilds rarely fit one context window, so Phase B manages context at two levels:
+- **Per-module subagents** are ephemeral — each build step is built by a fresh coding
+  subagent whose context is discarded on return (an automatic reset at every module).
+- **`REBUILD-PROGRESS.md`** is an *append-only* journal in the new repo. After every module
+  the orchestrator appends what it built, the decisions/constraints/caveats a future agent
+  must honor, and the next step. When context approaches **~150k tokens**, it finishes the
+  current module, writes a handoff entry, and stops. `/clean-room-resume` then continues the
+  build in a *fresh* context, reading the journal as its entire handoff. This repeats until
+  the build is done — so a project of any size can be rebuilt across many context windows.
+
 ---
 
 ## What's in `rebuild-docs/`
@@ -107,6 +118,10 @@ rm -rf ../original-clone
 # 4. Phase B — rebuild into THIS repo, from the docs alone.
 /clean-room-rebuild
 #   (defaults: docs = ./rebuild-docs, output = . )
+
+# 5. If the build hits its context budget and checkpoints, continue in a fresh
+#    session as many times as needed — it picks up from REBUILD-PROGRESS.md:
+/clean-room-resume
 ```
 
 Extraction reads the external clone and writes only into the current repo. The rebuild
@@ -122,12 +137,14 @@ clean-room-plugin/
 └─ clean-room/                            # the plugin
    ├─ .claude-plugin/plugin.json
    ├─ README.md
-   ├─ skills/clean-room-extract/SKILL.md  # Phase A orchestrator
+   ├─ skills/
+   │  ├─ clean-room-extract/SKILL.md      # Phase A orchestrator
+   │  └─ clean-room-resume/SKILL.md       # Phase B resume (continues from REBUILD-PROGRESS.md)
    ├─ agents/
    │  ├─ cleanroom-surveyor.md            # Phase A reader  (read-only)
    │  ├─ cleanroom-scribe.md              # Phase A writer  (owns the doc templates)
    │  └─ cleanroom-architect.md           # Phase B "Truth" oracle (docs-only)
-   └─ commands/clean-room-rebuild.md      # Phase B orchestrator
+   └─ commands/clean-room-rebuild.md      # Phase B orchestrator (+ context handoffs)
 ```
 
 ## License

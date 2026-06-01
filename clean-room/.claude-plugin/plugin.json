@@ -1,7 +1,7 @@
 {
   "name": "clean-room",
-  "version": "0.1.0",
-  "description": "Clean-room reverse engineering. Phase A: read a codebase and emit strict, bounded rebuild-docs/. Phase B: an orchestrator ('the Truth') hands scoped specs to coding agents to rebuild the project 1:1 without ever seeing the original source.",
+  "version": "0.2.0",
+  "description": "Clean-room reverse engineering. Phase A: read a codebase and emit strict, bounded rebuild-docs/. Phase B: an orchestrator ('the Truth') hands scoped specs to coding agents to rebuild the project 1:1 without ever seeing the original source — with context-budget handoffs (REBUILD-PROGRESS.md) and a resume skill for builds too large for one context window.",
   "author": {
     "name": "T-Rzeznik",
     "email": "trzeznik29@gmail.com"
